@@ -1,0 +1,148 @@
+{
+    "type": "root",
+    "children": [
+        {
+            "identifier": "Location_Name",
+            "title": "Location Name",
+            "autoIdentifier": true,
+            "type": "text"
+        },
+        {
+            "identifier": "Tech_Name",
+            "title": "Tech Name",
+            "autoIdentifier": true,
+            "type": "text"
+        },
+        {
+            "identifier": "Job",
+            "title": "Job",
+            "autoIdentifier": true,
+            "type": "integer"
+        },
+        {
+            "identifier": "Location_Address",
+            "title": "Location Address",
+            "autoIdentifier": true,
+            "type": "location",
+            "allow_manual_override": true
+        },
+        {
+            "identifier": "City",
+            "title": "City",
+            "autoIdentifier": true,
+            "type": "text"
+        },
+        {
+            "identifier": "State",
+            "title": "State",
+            "autoIdentifier": true,
+            "type": "text"
+        },
+        {
+            "identifier": "Zip",
+            "title": "Zip",
+            "autoIdentifier": true,
+            "type": "text"
+        },
+        {
+            "identifier": "Phone",
+            "title": "Phone ",
+            "autoIdentifier": true,
+            "type": "phone_number"
+        },
+        {
+            "identifier": "Total",
+            "title": "Total Extinguishers ",
+            "type": "integer",
+            "initialAnswer": "0"
+        },
+        {
+            "type": "group",
+            "autoIdentifier": true,
+            "children": [
+                {
+                    "identifier": "Number",
+                    "title": "Number",
+                    "autoIdentifier": true,
+                    "type": "integer"
+                },
+                {
+                    "identifier": "Size",
+                    "title": "Size",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "Type",
+                    "title": "Type",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "Mfg_Date",
+                    "title": "Mfg Date",
+                    "autoIdentifier": true,
+                    "type": "date"
+                },
+                {
+                    "identifier": "Last_6",
+                    "title": "Last 6 Year Maintenance Date",
+                    "type": "date"
+                },
+                {
+                    "identifier": "Last_12",
+                    "title": "Last 12 Year Hydro Test Date",
+                    "type": "date"
+                },
+                {
+                    "identifier": "Last_5",
+                    "title": "Last 5 Year Hydro Test Date ",
+                    "type": "date"
+                },
+                {
+                    "identifier": "Location_in_Site",
+                    "title": "Location in Site",
+                    "autoIdentifier": true,
+                    "type": "text",
+                    "multi_line": true
+                },
+                {
+                    "identifier": "Work_Completed",
+                    "title": "Work Completed",
+                    "autoIdentifier": true,
+                    "options": [
+                        {
+                            "text": "Annually"
+                        },
+                        {
+                            "text": "Monthly"
+                        }
+                    ],
+                    "type": "select"
+                },
+                {
+                    "identifier": "Results",
+                    "title": "Results",
+                    "autoIdentifier": true,
+                    "options": [
+                        {
+                            "text": "Pass"
+                        },
+                        {
+                            "text": "Fail"
+                        }
+                    ],
+                    "type": "select"
+                },
+                {
+                    "identifier": "Maintenance",
+                    "title": "Maintenance Required",
+                    "type": "boolean"
+                }
+            ],
+            "title": "Information",
+            "identifier": "Information"
+        }
+    ],
+    "title": "Fire Extinguisher Location Form"
+}
