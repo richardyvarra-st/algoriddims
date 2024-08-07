@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON Filter and Export</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Filtered JSON Data</h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>Identifier</th>
+                <th>Title</th>
+                <th>Required Rule</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button onclick="exportToExcel()">Export to Excel</button>
+    <button onclick="runScript()">Run Script</button>
+
+    <script>
+        // Sample JSON data
+        const jsonData = {
+    "type": "root",
+    "children": [
+        {
+            "identifier": "Date_of_Inspection",
+            "title": "Date of Inspection",
+            "autoIdentifier": true,
+            "type": "date"
+        },
+        {
+            "type": "group",
+            "autoIdentifier": true,
+            "children": [
+                {
+                    "identifier": "Name",
+                    "title": "Name",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "Address",
+                    "title": "Address",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "City",
+                    "title": "City",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "State",
+                    "title": "State",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "Zip",
+                    "title": "Zip",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "Phone",
+                    "title": "Phone",
+                    "autoIdentifier": true,
+                    "type": "phone_number"
+                }
+            ],
+            "minOccurs": 1,
+            "maxOccurs": 1,
+            "title": "Inspection Location",
+            "identifier": "Inspection_Location"
+        },
+        {
+            "type": "group",
+            "autoIdentifier": true,
+            "children": [
+                {
+                    "identifier": "First_Aid_Kit_Location",
+                    "title": "First Aid Kit Location",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "Type_of_Container",
+                    "title": "Type of Container",
+                    "autoIdentifier": true,
+                    "options": [
+                        {
+                            "text": "Type I"
+                        },
+                        {
+                            "text": "Type II"
+                        },
+                        {
+                            "text": "Type III"
+                        },
+                        {
+                            "text": "Type IV"
+                        }
+                    ],
+                    "type": "select"
+                },
+                {
+                    "identifier": "guide",
+                    "title": "American Safety & Health Institute CPR, AED and Basic First Aid Guide; Manual",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_A",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "Antiseptic",
+                    "title": "Antiseptic; Sting Free Wipes",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter qty"
+                },
+                {
+                    "identifier": "Adequate_antiseptic",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "sheer_strip_adhesive_bandages",
+                    "title": "Adhesive Bandages; Sheer Strip 1\"x3\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_sheer_strip_adhesive_bandages",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "adhesive_tape",
+                    "title": "Adhesive Tape; 1/2\"x2.5 yds",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_adhesive",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "Triangle_Bandage",
+                    "title": "Triangle Bandage w/Safety Pins; 40\"x40\"x56\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_Triangle",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "gauze_pads",
+                    "title": "Gauze Pads; 3\"x3\" Sterile Individually Wrapped",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_gauze",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "rolled_gauze_bandage",
+                    "title": "Gauze Bandage; Rolled 2\"x4.1 yds",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_rolled_gauze_bandage",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "ABD_pads",
+                    "title": "ABD Pads; Sterild 5\"x9\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_ABD_pads",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "oval_eye_pads",
+                    "title": "Eye Pads w/Adhesive Strips; Sterile, Oval Pair",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_oval_eye_pads",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "antibiotic_ointment",
+                    "title": "Triple Antibiotic Ointment; .5 gram packets",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_antibiotic",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "hydrogel_burn_gel",
+                    "title": "Hydrogel Burn Gel; 1/8th oz packets",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_Hydrogel_burn_gel",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "hydrogel_burn_gel_dressing",
+                    "title": "Hydrogel Burn Dressing; Sterile 4\"x4\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_burn_gel_dressing",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "exam_gloves",
+                    "title": "Exam Gloves; Non-latex, Pair",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_exam_gloves",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "eye_wash_screw_cap",
+                    "title": "Eye Wash w/Screw Cap; Sterile 1 oz bottle",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_eye_wash_screw_cap",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "kit_scissors",
+                    "title": "Kit Scissors",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_kit_scissors",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "ice_pack",
+                    "title": "Instant Ice Pack; 4\"x5\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_ice_pack",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "hand_sanitizer",
+                    "title": "Hand Sanitizer; 1/8th oz packets",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_hand_sanitizer",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "cpr_face_shield",
+                    "title": "CPR Face Shield",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_cpr_face_shield",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "foil_blanket",
+                    "title": "Foil Blanket",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_foil_blanket",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "class_A_label",
+                    "title": "ANSI Z308.1-2021 Class A Kit Label",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_class_A_label",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "Comments_A",
+                    "title": "Comments",
+                    "type": "text",
+                    "hint": "Make any comments needed for Kit"
+                }
+            ],
+            "title": "First Aid Kit Class A",
+            "identifier": "First_Aid_Kit_Class_A"
+        },
+        {
+            "type": "group",
+            "autoIdentifier": true,
+            "children": [
+                {
+                    "identifier": "First_Aid_Kit_Location",
+                    "title": "First Aid Kit Location",
+                    "autoIdentifier": true,
+                    "type": "text"
+                },
+                {
+                    "identifier": "Type_of_Container",
+                    "title": "Type of Container",
+                    "autoIdentifier": true,
+                    "options": [
+                        {
+                            "text": "Type I"
+                        },
+                        {
+                            "text": "Type II"
+                        },
+                        {
+                            "text": "Type III"
+                        },
+                        {
+                            "text": "Type IV"
+                        }
+                    ],
+                    "type": "select"
+                },
+                {
+                    "identifier": "guide",
+                    "title": "American Safety & Health Institute CPR, AED and Basic First Aid Guide; Manual",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_A",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "Triangle_Bandage",
+                    "title": "Triangle Bandage w/Safety Pins; 40\"x40\"x56\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_Triangle",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "sheer_strip_adhesive_bandages",
+                    "title": "Adhesive Bandages; Sheer Strip 1\"x3\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_sheer_strip_adhesive_bandages",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "adhesive_tape",
+                    "title": "Adhesive Tape; 1/2\"x2.5 yds",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_adhesive",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "gauze_pads",
+                    "title": "Gauze Pads; 3\"x3\" Sterile Individually Wrapped",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_gauze",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "ABD_pads",
+                    "title": "ABD Pads; Sterild 5\"x9\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_ABD_pads",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "rolled_gauze_bandage",
+                    "title": "Gauze Bandage; Rolled 2\"x4 yds",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_rolled_gauze_bandage",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "rolled_gauze_bandage_4_4",
+                    "title": "Gauze Bandage; Rolled 4\"x4 yds",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_rolled_gauze_bandage_4_4",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "eye_covering_attachment",
+                    "title": "Eye Covering w/means of attachment; 2.9 sq in",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_eye_covering_attachment",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "antibiotic_ointment",
+                    "title": "Triple Antibiotic Ointment; .5 gram packets",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_antibiotic",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "Antiseptic",
+                    "title": "Antiseptic; Sting Free Wipes",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_antiseptic",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "hydrogel_burn_gel",
+                    "title": "Hydrogel Burn Gel; 1/32 oz packets",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_burn_gel_dressing",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "hydrogel_burn_gel_dressing",
+                    "title": "Hydrogel Burn Dressing; Sterile 4\"x4\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_Hydrogel_burn_gel",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "exam_gloves",
+                    "title": "Exam Gloves; Non-latex, Pair",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_exam_gloves",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "eye_wash_screw_cap",
+                    "title": "Eye Wash w/Screw Cap; Sterile 1 oz bottle",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_eye_wash_screw_cap",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "kit_scissors",
+                    "title": "Kit Scissors",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_kit_scissors",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "ice_pack",
+                    "title": "Cold Pack; 4x5\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_cold_pack",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "hand_sanitizer",
+                    "title": "Hand Sanitizer; 1/32 oz packets",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_hand_sanitizer",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "cpr_breathing_barrier",
+                    "title": "CPR Breathing Barrier",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_cpr_face_shield",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "splint",
+                    "title": "Splint; 4\"x24\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_splint",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "tourniquet",
+                    "title": "Tourniquet",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_splint_copy",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "foil_blanket",
+                    "title": "Foil Blanket; 52\"x84\"",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_foil_blanket",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "class_A_label",
+                    "title": "ANSI Z308.1-2021 Class A Kit Label",
+                    "type": "integer",
+                    "required_rule": "always",
+                    "hint": "Enter Qty"
+                },
+                {
+                    "identifier": "Adequate_class_A_label",
+                    "title": "Adequate",
+                    "type": "boolean"
+                },
+                {
+                    "identifier": "Comments_A",
+                    "title": "Comments",
+                    "type": "text"
+                }
+            ],
+            "title": "First Aid Kit Class B",
+            "identifier": "First_Aid_Kit_Class_B"
+        },
+        {
+            "identifier": "Inspector_Name",
+            "title": "Technician Name",
+            "type": "text"
+        },
+        {
+            "identifier": "Inspector_Signature",
+            "title": "Technician Signature ",
+            "type": "signature",
+            "timestamp": true
+        },
+        {
+            "identifier": "Technician_License",
+            "title": "Technician License",
+            "autoIdentifier": true,
+            "type": "text",
+            "hint": "Add Tech License.  If multiple licenses, separate with comma."
+        },
+        {
+            "identifier": "servicetrade_job_id",
+            "title": "ServiceTrade Job ID",
+            "type": "text",
+            "readonly_rule": "always",
+            "hidden": true
+        },
+        {
+            "identifier": "servicetrade_job_number",
+            "title": "ServiceTrade Job Number",
+            "type": "text",
+            "timestamp": true
+        },
+        {
+            "identifier": "servicetrade_technician_id",
+            "title": "ServiceTrade Tech ID",
+            "type": "text",
+            "readonly_rule": "always",
+            "hidden": true
+        },
+        {
+            "identifier": "servicetrade_brand_logo",
+            "title": "Logo",
+            "type": "image",
+            "readonly_rule": "always"
+        },
+        {
+            "identifier": "servicetrade_office_address_street",
+            "title": "Office Address",
+            "type": "text",
+            "readonly_rule": "always",
+            "hidden": true
+        },
+        {
+            "identifier": "servicetrade_office_address_city",
+            "title": "Office City",
+            "type": "text",
+            "readonly_rule": "always",
+            "hidden": true
+        },
+        {
+            "identifier": "servicetrade_office_address_state",
+            "title": "Office State",
+            "type": "text",
+            "readonly_rule": "always",
+            "hidden": true
+        },
+        {
+            "identifier": "servicetrade_office_address_postal_code",
+            "title": "Office Zip Code",
+            "type": "text",
+            "readonly_rule": "always",
+            "hidden": true
+        },
+        {
+            "identifier": "Office_License",
+            "title": "Office License",
+            "autoIdentifier": true,
+            "type": "text",
+            "hint": "Contractor's License #, will display on cover sheet"
+        }
+    ],
+    "title": "First Aid Kit Inspection 2021 ed",
+    "description": "DO NOT EDIT - FINAL 7/25/24"
+};
+
+        // Function to filter and display the JSON data
+        function filterAndDisplayData() {
+            const tbody = document.getElementById('data-table').querySelector('tbody');
+            tbody.innerHTML = '';
+
+            const filteredData = jsonData.children.flatMap(group => 
+                group.children ? group.children.filter(item => item.required_rule === 'always') : []
+            );
+
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${item.identifier}</td><td>${item.title}</td><td>${item.required_rule}</td>`;
+                tbody.appendChild(row);
+            });
+
+            return filteredData;
+        }
+
+        // Call the function to filter and display the data on load
+        const filteredData = filterAndDisplayData();
+
+        // Function to export the filtered data to Excel
+        function exportToExcel() {
+            const worksheet = XLSX.utils.json_to_sheet(filteredData.map(({ identifier, title, required_rule }) => ({ identifier, title, required_rule })));
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Filtered Data');
+            XLSX.writeFile(workbook, 'filtered_data.xlsx');
+        }
+
+        // Function to run a script
+        function runScript() {
+            // Example script content
+            const scriptContent = 'console.log("Script executed");';
+            const blob = new Blob([scriptContent], { type: 'text/javascript' });
+            saveAs(blob, 'script.js');
+        }
+    </script>
+</body>
+</html>
