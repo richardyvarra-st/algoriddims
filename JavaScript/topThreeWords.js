@@ -1,3 +1,9 @@
+/**
+ * Returns the top three most frequently occurring words in the given text.
+ *
+ * @param {string} text - The input text.
+ * @returns {string[]} - An array containing the top three most frequently occurring words.
+ */
 function topThreeWords(text) {
     text = text.toLowerCase();
     let words = text.match(/[a-z]+[a-z']*/g);
